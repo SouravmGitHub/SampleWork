@@ -1,1 +1,6 @@
-
+This script was developed by me for Data Analysis by the DA Team. A small part of it has been presented here for demonstration purpose.
+Input:- The script takes the CEMS data sheet from the Portal-(server) as input which has the per minute Particulate Matter -(PM) data values. 
+Analysis:- The Analysis is done using Python Version: 3.9.7 & PANDAS Version: 1.4.0 as per CPCB guidelines and standards for PM. The Logic is derived from it. 
+            It takes of all the required standards ranging from Data Availability to Data Quality for emission data collected from the analyzers. 
+Output:- Post-Analysis the script generates an output in excel-sheet format (Final_Output) with all the details of the analysis. 
+ 
