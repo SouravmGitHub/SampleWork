@@ -1,4 +1,5 @@
 Among the various RM & Sys Admin related activities in the RA Project, an important part was the design and development of various Scripts to 
 administer, maintain and check the activity and health of Applicaton servers Post deployment / Pre-Deployment. Since it was primarily a Windows 
 .Net based environment, I developed scripts in PowerShell Version: 5.0 to ensure the smooth and efficient operation of the Application. 
+The folder contains three samples. 
 
