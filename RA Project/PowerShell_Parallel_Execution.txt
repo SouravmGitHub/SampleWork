@@ -1,0 +1,39 @@
+# Written by: Sourav Mohanty
+# Scripting : PowerShell 5.0
+# These Function demontstartes how a function is executed parallelly in all the servers which have a Batch Listener. 
+# The Script is executed as a Job and demonstartes how a function can be executed simultaneously at all servers.
+# The central idea is to reduce the time of execution for a long list of servers. It was demonstarted to the management.  
+
+function Display{
+Write-Host "*************** Status**********************" -ForegroundColor Magenta
+Get-Content D:\Scripts\*****_Utility\Verification.txt
+}
+
+function *****ListenerStart{
+param( $Cred, $ServerList)
+        $Servers = $ServerList
+        $Cred = $global:Cred
+        Invoke-Command -computername ($Servers) -Credential $Cred -scriptblock{
+        Get-Service | where { $_.Name -eq  "######" -and $_.Status -eq "Stopped" } | Start-Service 
+        } -AsJob | Receive-Job -AutoRemoveJob -Wait
+        }
+
+function *****ListenerStop{
+param( $Cred, $ServerList)
+        $Servers = $ServerList
+        $Cred = $global:Cred
+        Invoke-Command -computername ($Servers) -Credential $Cred -scriptblock{
+        Get-Service | where { $_.Name -eq  "######" -and $_.Status -eq "Running"} | Stop-Service  
+        } -AsJob | Receive-Job -AutoRemoveJob -Wait
+        }
+
+function *****ListenerState{
+ param( $Cred, $ServerList)
+        $Servers = $ServerList
+        $Cred = $global:Cred
+        global:Test
+        Invoke-Command -computername ($Servers) -Credential $Cred -scriptblock{
+        Get-Service | where { $_.Name -eq  "######"} 
+        } -AsJob | Receive-Job -AutoRemoveJob -Wait| Select PSComputerName,Name,Status -ExcludeProperty RunspaceId | Sort-Object -Property PSComputerName | Format-list >> D:\Scripts\*****_Utility\Verification.txt
+        Display;
+        }

@@ -1,0 +1,53 @@
+# Written by: Sourav Mohanty
+# Scripting : PowerShell 5.0
+# Sample of a script written by me to find the version of the code deployed to Service, Batch and Presentation Tier Servers.
+
+# This is implemented by a Powershell Function -> Check_Version. The IP of the list of ST and PT Servers will be entered in the txt file by the Administrator. The script will display the Version of Code in each server in the list and the number of files present, post deployment. 
+
+Function Check_Version{
+
+# List of Service-Tier Servers 
+$global:ST_Servers = gc -Path D:\Scripts\XXXX\ServiceTier.txt
+# List of Presentation-Tier Servers 
+$global:PT_Servers = gc -Path D:\Scripts\XXXX\PresentationTier.txt
+# List of Batch-Tier Servers
+$global:Batch_Servers = gc -Path D:\Scripts\XXXX\BatchTier.txt
+# Administrator Credentials to log in 
+#$global:Cred = Get-Credential -Credential Environment\Admin-User-ID
+
+$S = { $CName = (Get-WmiObject Win32_Computersystem).name
+        $FVersion = (Get-Item D:\****\****.ServiceTier\bin\****.WebHost.dll).VersionInfo.FileVersion
+        $Total = (Get-ChildItem D:\****\****.ServiceTier | Measure-Object).Count
+        Write-Host $CName,"`t",$FVersion,"`t`t",$Total
+      }
+$B = { $CName = (Get-WmiObject Win32_Computersystem).name 
+        $FVersion = (Get-Item D:\****\****.Batch\****.BatchProcess.Common.dll).VersionInfo.FileVersion
+        $Total = (Get-ChildItem D:\****\****.Batch | Measure-Object).Count
+        Write-Host $CName,"`t",$FVersion,"`t`t",$Total
+     }
+$P = { $CName = (Get-WmiObject Win32_Computersystem).name 
+       $FVersion = (Get-Item D:\****\****.PresentationTier\bin\****.Utility.PresentationTier.dll).VersionInfo.FileVersion
+       $Total = (Get-ChildItem D:\****\****.PresentationTier | Measure-Object).Count
+       Write-Host $CName,"`t",$FVersion,"`t`t",$Total
+     }
+
+    Write-Host "*************** Service Tier Version Info**********************" -ForegroundColor Magenta 
+    Write-Host "Server Name", "`t`t","Version","`t`t","File Count" -ForegroundColor Yellow
+
+foreach ($Comp in $global:ST_Servers){
+  Invoke-Command -ComputerName $Comp -Credential $global:Cred -ScriptBlock $S
+}
+
+    Write-Host "*************** Batch Tier Version Info**********************" -ForegroundColor Magenta 
+    Write-Host "Server Name", "`t`t","Version","`t`t","File Count" -ForegroundColor Yellow
+
+foreach ($Comp in $global:Batch_Servers){
+  Invoke-Command -ComputerName $Comp -Credential $global:Cred -ScriptBlock $B
+}
+
+    Write-Host "*************** Presentation Tier Version Info**********************" -ForegroundColor Magenta 
+    Write-Host "Server Name", "`t`t","Version","`t`t","File Count" -ForegroundColor Yellow
+
+foreach ($Comp in $global:PT_Servers){
+  Invoke-Command -ComputerName $Comp -Credential $global:Cred -ScriptBlock $P
+}

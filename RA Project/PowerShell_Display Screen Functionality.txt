@@ -1,0 +1,33 @@
+# Display function - Script written in Powershell 5.0
+# The script will be able to perform the below operations based on user input.
+# Author:- Sourav Mohanty 
+
+function Get-Action{
+            CLS
+	   Write-Host "`n`t ***** Utility for PRODUCTION - Version 1.2`n" -ForegroundColor Magenta
+	   Write-Host "`t`t Please select Action`n" -Fore Yellow
+
+            Write-Host "`t`t For Entire Production `n" -Fore Yellow
+
+	    Write-Host "`t`t`t1. Status" -Fore Cyan
+	    Write-Host "`t`t`t2. Start" -Fore Cyan
+            Write-Host "`t`t`t3. Stop" -Fore Cyan
+            Write-Host "`t`t`t4. ***** Code Version for all Tiers`n" -Fore Cyan
+			
+            ##################################################################
+            Write-Host "`t`t ***** Listener related Operations `n" -Fore Yellow
+			
+            Write-Host "`t`t`t5. Restart Listener" -Fore Cyan
+            Write-Host "`t`t`t6. Listener Start Time and Code Version" -Fore Cyan
+            Write-Host "`t`t`t7. Stop Listener" -Fore Cyan
+            Write-Host "`t`t`t8. Start Listener`n" -Fore Cyan
+			
+            ##################################################################
+            Write-Host "`t`t Admin General `n" -Fore Yellow
+		
+            Write-Host "`t`t`t9. Last Boot Time for Server-(N/A)" -Fore Cyan
+            Write-Host "`t`t`t10.Restart Server-(N/A)`n" -Fore Cyan
+            Write-Host "`t`t`t0.Quit and Exit`n" -ForegroundColor Magenta
+            $Result = Read-Host -Prompt "Enter Choice"
+            switch ($Result)
+{
