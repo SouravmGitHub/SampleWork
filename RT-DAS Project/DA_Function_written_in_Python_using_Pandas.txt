@@ -1,0 +1,119 @@
+# Written by: Sourav Mohanty
+# Scripting : Python Ver 3.9 using PANDAS 
+# Evaluates the Data Availability from input data of an Excel-Sheet and calculates the percentage of Data Available for the industry.
+# Daily Per minute Data in 24 hours = 1440. To Meet the Data Availability criteria required by the Pollution board, it must have a minimum of 85%   percent minute data which is 1152. Else the exception is recorded in the output excel file. 
+
+
+def DA_Analysis (df4,df,res,d4) :
+        # number_of_rows =0
+        d4 = d4
+        res1 = d4.replace("/","_")
+        res1 = res1.strip()
+        sys.stdout = open(f"{parent_dir}/Log.txt", "a")
+        wb = load_workbook(f"{output_dir}/{str(res)}_{str(res1)}_Output.xlsx")
+        #################################
+        number_of_columns =0; j=2 ; interval = "" ; interval_zero_data = "" ; interval_no_data = ""
+        print(df4.iloc[2,0])
+        wb["Data Availablity"].cell(row=1, column=1, value = df4.iloc[2,0])
+        wb["Data Availablity"].cell(row=1, column=2, value = d4)
+        wb["Summary"].cell(row=1, column=1, value = df4.iloc[2,0])
+        wb["Summary"].cell(row=1, column=2, value = d4)
+        print(df4.iloc[3,0])
+        print("\n********************************* A N A L Y S I S    F O R     D A T A    A V A I L A B L I T Y **************")
+        number_of_columns = len(df.columns)
+        # Initialize half-hourly variables to zero.
+        k=0 ; m=0 ; n=0 ; i=0 ; total=0 ; f=0
+        print("\n")
+        while j < number_of_columns :
+                        print(f"\nSTACK: {df4.iloc[6,j]}")
+                        print("-------------------------")
+                        wb["Data Availablity"].cell(row= j+1, column=1, value = df4.iloc[6,j])
+                        # Initialize flag variables to zero.
+                        flag_zero_and_null =0
+                        df2 = df.iloc[:,j]
+                        count_null_values = df2.isna().sum()                                
+                        count_zero_values = (df2 == 0 ).sum()                               
+                        total_count_zero_and_null = count_null_values + count_zero_values   
+                        total = round(((1440 - total_count_zero_and_null) /1440),2)
+                        total = total * 100 
+                        if (total_count_zero_and_null > 216 ) : 
+                            flag_zero_and_null = 1
+                        while i < 1411 : 
+                                # print(i)
+                                    if (flag_zero_and_null == 1 ) : break;
+                                    df1 = df2.loc[i:(i+30)]
+                                    count_null_values = df1.isna().sum()
+                                    count_zero_values = (df1 == 0 ).sum()
+                                    total_count_zero_and_null = count_null_values + count_zero_values
+                                    if(total_count_zero_and_null > 9 ) :
+                                        d1=""; d2=""
+                                        d1=df4.iloc[7+i,1]
+                                        d1 = d1[11:16]
+                                        d2=df4.iloc[37+i,1]
+                                        d2 = d2[11:16]
+                                        d1 = str(d1); d2 = str(d2) ; d3 =" to " ; d4 = "; "
+                                        interval += d1 + d3 + d2 + d4
+                                        print(f"Half-Hourly Data Loss between {d1} and {d2}")
+                                        k=k+1
+                                    if(count_null_values > 29 ) :
+                                        d1=""; d2=""
+                                        d1=df4.iloc[7+i,1]
+                                        d1 = d1[11:16]
+                                        d2=df4.iloc[37+i,1]
+                                        d2 = d2[11:16]
+                                        d1 = str(d1); d2 = str(d2) ; d3 =" to " ; d4 = "; "
+                                        interval_no_data += d1 + d3 + d2 + d4
+                                        print(f"(NA) values between {d1} and {d2}")
+                                        m=m+1
+                                    if(count_zero_values > 29 ) :
+                                        d1=""; d2=""
+                                        d1=df4.iloc[7+i,1]
+                                        d1 = d1[11:16]
+                                        d2=df4.iloc[37+i,1]
+                                        d2 = d2[11:16]
+                                        d1 = str(d1); d2 = str(d2) ; d3 =" to " ; d4 = "; "
+                                        interval_zero_data += d1 + d3 + d2 + d4
+                                        print(f"0 values between {d1} and {d2}")
+                                        n=n+1
+                                    i=i+30
+                        print(f"DA Percentage:{total}")
+                        wb["Data Availablity"].cell(row= j+1, column=2, value= total)
+                        if(flag_zero_and_null ==1) :
+                            print("!! DATA LOSS for the Day")
+                            wb["Data Availablity"].cell(row= j+1, column=3, value= "X")
+                            wb["Data Availablity"].cell(row=j+1, column=6, value= "Less than 85 percent of total data")
+                            print("Less than 85 percent of total data")
+                        if(k > 5) :
+                            print("!! DATA LOSS for the Day")
+                            wb["Data Availablity"].cell(row=j+1, column=3, value= "X")
+                            wb["Data Availablity"].cell(row=j+1, column=6, value= str(interval))
+                            print(f"{k} Half-Hourly occurances of loss.")
+                            print("Allowed is upto 5 Half-Hourly occurances")
+                            f=1
+                        if(n >= 4) :
+                            print("!! DATA LOSS for the Day")
+                            wb["Data Availablity"].cell(row=j+1, column=4, value= "X")
+                            wb["Data Availablity"].cell(row=j+1, column=7, value= str(interval_zero_data))
+                            print("Category: ZERO-DATA")
+                            print(f"{m} Half-Hourly occurances.")
+                            print("Allowed is 4 Half-Hourly occurances")
+                        if(m >= 4) :
+                            print("!! DATA LOSS for the Day")
+                            wb["Data Availablity"].cell(row=j+1, column=5, value= "X")
+                            wb["Data Availablity"].cell(row=j+1, column=8, value= str(interval_no_data))
+                            print("Category: NO-DATA")
+                            print(f"{n} Half-Hourly occurances.")
+                            print("Allowed is 4 Half-Hourly occurances")
+                        if ((total >= 85) & (f != 1)) :
+                            print("OK")
+                            wb["Data Availablity"].cell(row=j+1, column=3, value= "Ok")
+                        j=j+1 ; interval ="" ; interval_zero_data ="" ; interval_no_data =""
+                        k=0; m=0; n=0 ; f=0
+                        i=0
+                        count_null_values =0
+                        count_zero_values =0
+                        total_count_zero_and_null = 0
+        print("\n")
+        wb.save(f"{output_dir}/{str(res)}_{str(res1)}_Output.xlsx")
+        sys.stdout.close()
+        # Column_Fit(res,1,d4)
